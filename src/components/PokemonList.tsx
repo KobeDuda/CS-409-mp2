@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { formatPokemonName } from "../formatPokemonName";
 import PokemonCard from "./PokemonCard";
 
 interface PokemonListItem {

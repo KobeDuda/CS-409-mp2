@@ -24,7 +24,7 @@ const PokemonDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  useNavigate();
 
   const currentId = parseInt(id || "1", 10);
 

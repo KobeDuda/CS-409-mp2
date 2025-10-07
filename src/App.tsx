@@ -1,10 +1,6 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { homedir } from 'os';
-import axios from 'axios';
-import { fetchWithCache } from './cache';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import PokemonList from "./components/PokemonList";
 import PokemonDetail from "./components/PokemonDetail";
 import GalleryView from "./components/GalleryView";
