@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { formatPokemonName } from "../formatPokemonName";
+import PokemonCard from "./PokemonCard";
 
 interface PokemonListItem {
   name: string;
@@ -108,20 +110,7 @@ const PokemonList: React.FC = () => {
             const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
 
             return (
-              <Link
-                key={id}
-                to={`/pokemon/${id}`}
-                className="border rounded-xl p-3 capitalize bg-white shadow-sm hover:shadow-md transition flex flex-col items-center"
-              >
-                <img
-                  src={spriteUrl}
-                  alt={p.name}
-                  className="w-20 h-20 object-contain mb-2"
-                  loading="lazy"
-                />
-                <span className="font-medium">{p.name}</span>
-                <span className="text-gray-500 text-sm">#{id}</span>
-              </Link>
+              <PokemonCard id={id} name={p.name} sprite={spriteUrl} />
             );
           })}
         </ul>
