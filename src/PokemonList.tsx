@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 interface PokemonListItem {
   name: string;
@@ -7,9 +8,6 @@ interface PokemonListItem {
 }
 
 interface PokemonListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
   results: PokemonListItem[];
 }
 
@@ -43,7 +41,6 @@ const PokemonList: React.FC = () => {
     return match ? parseInt(match[1], 10) : 0;
   };
 
-  // Filter and sort logic
   const filteredAndSorted = useMemo(() => {
     const filtered = pokemonList.filter((p) =>
       p.name.toLowerCase().includes(search.toLowerCase())
@@ -54,7 +51,7 @@ const PokemonList: React.FC = () => {
 
       if (sortField === "name") {
         compareValue = a.name.localeCompare(b.name);
-      } else if (sortField === "id") {
+      } else {
         compareValue = getPokemonId(a.url) - getPokemonId(b.url);
       }
 
@@ -68,7 +65,6 @@ const PokemonList: React.FC = () => {
     <div className="flex flex-col items-center p-4">
       <h1 className="text-3xl font-bold mb-4">Pokédex List</h1>
 
-      {/* Search bar */}
       <input
         type="text"
         placeholder="Search Pokémon..."
@@ -77,7 +73,6 @@ const PokemonList: React.FC = () => {
         className="border rounded p-2 mb-4 w-64"
       />
 
-      {/* Sorting controls */}
       <div className="flex gap-4 mb-4">
         <label>
           Sort by:{" "}
@@ -113,8 +108,9 @@ const PokemonList: React.FC = () => {
             const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
 
             return (
-              <li
-                key={p.name}
+              <Link
+                key={id}
+                to={`/pokemon/${id}`}
                 className="border rounded-xl p-3 capitalize bg-white shadow-sm hover:shadow-md transition flex flex-col items-center"
               >
                 <img
@@ -125,7 +121,7 @@ const PokemonList: React.FC = () => {
                 />
                 <span className="font-medium">{p.name}</span>
                 <span className="text-gray-500 text-sm">#{id}</span>
-              </li>
+              </Link>
             );
           })}
         </ul>
