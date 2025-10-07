@@ -1,0 +1,137 @@
+import React, { useEffect, useState, useMemo } from "react";
+import axios from "axios";
+
+interface PokemonListItem {
+  name: string;
+  url: string;
+}
+
+interface PokemonListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: PokemonListItem[];
+}
+
+type SortField = "name" | "id";
+type SortOrder = "asc" | "desc";
+
+const PokemonList: React.FC = () => {
+  const [pokemonList, setPokemonList] = useState<PokemonListItem[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [sortField, setSortField] = useState<SortField>("id");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+
+  useEffect(() => {
+    const fetchAllPokemon = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get<PokemonListResponse>(
+          "https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0"
+        );
+        setPokemonList(response.data.results);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllPokemon();
+  }, []);
+
+  const getPokemonId = (url: string): number => {
+    const match = url.match(/\/pokemon\/(\d+)\//);
+    return match ? parseInt(match[1], 10) : 0;
+  };
+
+  // Filter and sort logic
+  const filteredAndSorted = useMemo(() => {
+    const filtered = pokemonList.filter((p) =>
+      p.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const sorted = [...filtered].sort((a, b) => {
+      let compareValue = 0;
+
+      if (sortField === "name") {
+        compareValue = a.name.localeCompare(b.name);
+      } else if (sortField === "id") {
+        compareValue = getPokemonId(a.url) - getPokemonId(b.url);
+      }
+
+      return sortOrder === "asc" ? compareValue : -compareValue;
+    });
+
+    return sorted;
+  }, [pokemonList, search, sortField, sortOrder]);
+
+  return (
+    <div className="flex flex-col items-center p-4">
+      <h1 className="text-3xl font-bold mb-4">Pokédex List</h1>
+
+      {/* Search bar */}
+      <input
+        type="text"
+        placeholder="Search Pokémon..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border rounded p-2 mb-4 w-64"
+      />
+
+      {/* Sorting controls */}
+      <div className="flex gap-4 mb-4">
+        <label>
+          Sort by:{" "}
+          <select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value as SortField)}
+            className="border rounded p-1"
+          >
+            <option value="id">ID</option>
+            <option value="name">Name</option>
+          </select>
+        </label>
+
+        <label>
+          Order:{" "}
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+            className="border rounded p-1"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </label>
+      </div>
+
+      {loading ? (
+        <p>Loading Pokémon...</p>
+      ) : (
+        <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full max-w-4xl">
+          {filteredAndSorted.map((p) => {
+            const id = getPokemonId(p.url);
+            const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+
+            return (
+              <li
+                key={p.name}
+                className="border rounded-xl p-3 capitalize bg-white shadow-sm hover:shadow-md transition flex flex-col items-center"
+              >
+                <img
+                  src={spriteUrl}
+                  alt={p.name}
+                  className="w-20 h-20 object-contain mb-2"
+                  loading="lazy"
+                />
+                <span className="font-medium">{p.name}</span>
+                <span className="text-gray-500 text-sm">#{id}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export default PokemonList;
