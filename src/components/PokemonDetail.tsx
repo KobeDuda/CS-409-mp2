@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { formatPokemonName } from "../formatPokemonName";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 
 interface PokemonDetailData {
   id: number;
@@ -21,6 +23,13 @@ const PokemonDetail: React.FC = () => {
   const [pokemon, setPokemon] = useState<PokemonDetailData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  const currentId = parseInt(id || "1", 10);
+
+  const prevId = currentId > 1 ? currentId - 1 : null;
+  const nextId = currentId + 1;
 
   useEffect(() => {
     const fetchPokemonDetails = async () => {
@@ -140,6 +149,25 @@ const PokemonDetail: React.FC = () => {
 
   return (
     <div className="p-4 flex flex-col items-center">
+      <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between px-2">
+        {prevId && (
+          <Link
+            to={`/pokemon/${prevId}`}
+            className="p-2 rounded-full bg-white shadow hover:bg-sky-100 transition"
+            aria-label="Previous Pokémon"
+          >
+            <ChevronLeft className="w-6 h-6 text-sky-600" />
+          </Link>
+        )}
+
+        <Link
+          to={`/pokemon/${nextId}`}
+          className="p-2 rounded-full bg-white shadow hover:bg-sky-100 transition ml-auto"
+          aria-label="Next Pokémon"
+        >
+          <ChevronRight className="w-6 h-6 text-sky-600" />
+        </Link>
+      </div>
       <h1 className="text-3xl font-bold capitalize mb-4">{formatPokemonName(pokemon.name)}</h1>
       <img
         src={pokemon.sprite}
